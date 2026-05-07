@@ -1,0 +1,29 @@
+{
+  "slug": "welcome",
+  "subject": "Welcome to your newsletter",
+  "preheader": "This is your first edition — edit it in the gatewaze admin.",
+  "composition_mode": "blocks",
+  "wrapper_key": "default",
+  "blocks": [
+    {
+      "block_def_name": "heading",
+      "sort_order": 1000,
+      "content": { "text": "Welcome aboard", "level": "h1" }
+    },
+    {
+      "block_def_name": "paragraph",
+      "sort_order": 2000,
+      "content": {
+        "body": "Thanks for subscribing! This is the welcome edition that ships with the gatewaze email boilerplate. You can edit it from the visual canvas — drag in new blocks, swap copy, or fork the source.html to restyle every block."
+      }
+    },
+    {
+      "block_def_name": "cta_button",
+      "sort_order": 3000,
+      "content": {
+        "label": "Read the full story",
+        "href": "https://example.com/welcome"
+      }
+    }
+  ]
+}
