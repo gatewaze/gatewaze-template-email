@@ -1,0 +1,14 @@
+{
+  "$schema": "https://gatewaze.com/schemas/theme.v1.json",
+  "name": "gatewaze-template-email",
+  "version": "0.1.0",
+  "theme_kind": "email",
+  "description": "Default HTML email boilerplate. One source.html file with WRAPPER + BLOCK + BRICK markers for the templates parser; ingested into templates_wrappers / templates_block_defs / templates_brick_defs on apply-source.",
+  "source_path": "source.html",
+  "wrappers": {
+    "default": {
+      "name": "Default email wrapper",
+      "key": "default"
+    }
+  }
+}

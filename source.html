@@ -1,0 +1,156 @@
+<!--
+  gatewaze email boilerplate — single source.html with marker grammar.
+
+  The templates parser (gatewaze-modules/modules/templates/lib/parser/) walks
+  this file and extracts:
+    - WRAPPER:default            → templates_wrappers row
+    - BLOCK:<key>                → templates_block_defs row + adjacent SCHEMA
+    - BRICK:<key>                → templates_brick_defs row (nested in a block)
+    - META:<key>                 → wrapper-slot declaration
+    - SCHEMA:{ ...JSON Schema }  → block / brick / wrapper field schema
+
+  Field interpolation uses Mustache syntax — `{{title}}` from content,
+  `{{>page_body}}` for the wrapper's content slot, `{{#sections}}…{{/sections}}`
+  for arrays.
+
+  Operators fork this and replace block HTML with their brand styles.
+  Adding a new block = add a new BLOCK / /BLOCK section. Run "Apply theme"
+  in the gatewaze admin's Source tab to ingest.
+-->
+
+<!-- WRAPPER:default | name=Default email wrapper -->
+<!-- META:preheader -->
+<!-- /META:preheader -->
+<!-- SCHEMA:{
+  "type": "object",
+  "properties": {
+    "subject": { "type": "string", "title": "Subject line" },
+    "preheader": { "type": "string", "title": "Preheader" }
+  }
+} -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{subject}}</title>
+  <style>
+    body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f6f6f6; color: #1a1a1a; }
+    .container { max-width: 600px; margin: 0 auto; padding: 32px 24px; background: #ffffff; }
+    h1, h2, h3 { line-height: 1.2; margin: 0 0 16px; }
+    p { margin: 0 0 16px; line-height: 1.6; }
+    a { color: #00a2c7; }
+    .preheader { display: none !important; visibility: hidden; opacity: 0; height: 0; max-height: 0; overflow: hidden; mso-hide: all; }
+    .cta { display: inline-block; padding: 12px 24px; background: #00a2c7; color: #ffffff !important; text-decoration: none; border-radius: 6px; font-weight: 600; }
+    .footer { margin-top: 32px; font-size: 12px; color: #71717a; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="preheader">{{preheader}}</div>
+  <div class="container">
+    {{>page_body}}
+    <div class="footer">
+      <p>You're receiving this because you subscribed to our newsletter.</p>
+      <p><a href="{{unsubscribe_url}}">Unsubscribe</a></p>
+    </div>
+  </div>
+</body>
+</html>
+<!-- /WRAPPER:default -->
+
+
+<!-- BLOCK:heading | name=Heading | description=Single heading element | sort_order=1 -->
+<!-- SCHEMA:{
+  "type": "object",
+  "properties": {
+    "text": { "type": "string", "title": "Text" },
+    "level": { "type": "string", "enum": ["h1", "h2", "h3"], "default": "h2", "title": "Level" }
+  },
+  "required": ["text"]
+} -->
+<{{level}}>{{text}}</{{level}}>
+<!-- /BLOCK:heading -->
+
+
+<!-- BLOCK:paragraph | name=Paragraph | description=Body text with rich HTML | sort_order=2 -->
+<!-- SCHEMA:{
+  "type": "object",
+  "properties": {
+    "body": { "type": "string", "format": "html", "title": "Body" }
+  },
+  "required": ["body"]
+} -->
+<p>{{{body}}}</p>
+<!-- /BLOCK:paragraph -->
+
+
+<!-- BLOCK:cta_button | name=Call-to-action button | description=Primary CTA link | sort_order=3 -->
+<!-- SCHEMA:{
+  "type": "object",
+  "properties": {
+    "label": { "type": "string", "title": "Button label" },
+    "href":  { "type": "string", "title": "Link URL" }
+  },
+  "required": ["label", "href"]
+} -->
+<p style="text-align: center; margin: 32px 0;">
+  <a class="cta" href="{{href}}">{{label}}</a>
+</p>
+<!-- /BLOCK:cta_button -->
+
+
+<!-- BLOCK:event_list | name=Event list | description=List of upcoming events | has_bricks=true | sort_order=4 -->
+<!-- SCHEMA:{
+  "type": "object",
+  "properties": {
+    "headline": { "type": "string", "title": "Section headline" }
+  }
+} -->
+<h2>{{headline}}</h2>
+<ul>
+  {{#bricks}}{{> event_list_item}}{{/bricks}}
+</ul>
+
+<!-- BRICK:event_list_item | name=Event list item | sort_order=1 -->
+<!-- SCHEMA:{
+  "type": "object",
+  "properties": {
+    "title":     { "type": "string", "title": "Event title" },
+    "date":      { "type": "string", "title": "Date" },
+    "url":       { "type": "string", "title": "Link" },
+    "summary":   { "type": "string", "format": "html", "title": "Summary" }
+  },
+  "required": ["title", "url"]
+} -->
+<li>
+  <strong><a href="{{url}}">{{title}}</a></strong> — {{date}}
+  {{#summary}}<div>{{{summary}}}</div>{{/summary}}
+</li>
+<!-- /BRICK:event_list_item -->
+<!-- /BLOCK:event_list -->
+
+
+<!-- BLOCK:divider | name=Divider | description=Horizontal rule | sort_order=5 -->
+<!-- SCHEMA:{ "type": "object", "properties": {} } -->
+<hr style="border: 0; border-top: 1px solid #e4e4e7; margin: 32px 0;" />
+<!-- /BLOCK:divider -->
+
+
+<!-- BLOCK:image | name=Image | description=Centered image with optional caption | sort_order=6 -->
+<!-- SCHEMA:{
+  "type": "object",
+  "properties": {
+    "src":     { "type": "string", "title": "Image URL" },
+    "alt":     { "type": "string", "title": "Alt text" },
+    "caption": { "type": "string", "title": "Caption" },
+    "href":    { "type": "string", "title": "Link URL (optional)" }
+  },
+  "required": ["src", "alt"]
+} -->
+<p style="text-align: center;">
+  {{#href}}<a href="{{href}}">{{/href}}
+  <img src="{{src}}" alt="{{alt}}" style="max-width: 100%; height: auto;" />
+  {{#href}}</a>{{/href}}
+  {{#caption}}<br /><small>{{caption}}</small>{{/caption}}
+</p>
+<!-- /BLOCK:image -->

@@ -1,0 +1,10 @@
+{
+  "name": "gatewaze-template-email",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "Boilerplate email theme for the gatewaze newsletters / events / calendars modules. Single source.html marked up with WRAPPER / BLOCK / BRICK comments per the templates parser grammar.",
+  "scripts": {
+    "lint": "echo 'no lint configured (HTML-only theme; gatewaze ingest is the validator)'"
+  }
+}
