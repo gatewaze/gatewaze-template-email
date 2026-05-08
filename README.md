@@ -1,11 +1,30 @@
 # gatewaze-template-email
 
-Boilerplate email theme for the gatewaze newsletters / events / calendars modules. **Two coexisting authoring paths:**
+Boilerplate email theme for the gatewaze newsletters / events / calendars modules. Cloned per-newsletter on creation; rendered editions are written back to the cloned repo's `publish` branch.
 
-1. **Mustache (`source.html`)** — single file marked up with the templates parser's WRAPPER / BLOCK / BRICK comment grammar. Any block authored here ends up in the email block library as `render_kind='mustache'`. The original gatewaze authoring path; still fully supported.
-2. **React-email registry (`manifest.json`)** — declarative manifest enabling the platform's react-email block components (Heading / Text / Button / …) for newsletters cloning this boilerplate. See **Newsletter clone + publish workflow** below.
+This repo follows the [react-email](https://react.email) project layout, seeded with the **Barebone** demo templates. Three coexisting authoring paths:
 
-When a newsletter is created with `NEWSLETTERS_BOILERPLATE_URL` pointing at this repo, the platform clones it as a per-newsletter internal Git repo. Edition publishes write rendered HTML back to the cloned repo's `publish` branch (`editions/<edition_id>.html`); operators can graduate the internal repo to an external GitHub remote at any time.
+1. **React-Email starter templates (`emails/*.tsx`)** — full-edition TSX templates ported from [react-email's Barebone demo](https://github.com/resend/react-email/tree/canary/apps/demo/emails/01-Barebone). Operators preview them locally with `pnpm email:dev` and copy any of them as the starting point for a new edition.
+2. **React-email block registry (`manifest.json` → `enabled_blocks`)** — declarative manifest enabling the platform's react-email block components (Header / ContentSection / AiContentSection / Footer / Heading / Text / Button) for newsletters cloning this boilerplate. This is the path the editor's slash-command palette uses today.
+3. **Mustache (`source.html`, legacy)** — single file marked up with the templates parser's WRAPPER / BLOCK / BRICK comment grammar. Any block authored here ends up in the email block library as `render_kind='mustache'`. Still fully supported for the original gatewaze authoring workflow.
+
+## Local preview
+
+Install once:
+
+```bash
+pnpm install
+```
+
+Run the react-email dev server:
+
+```bash
+pnpm email:dev
+```
+
+Open <http://localhost:3000> to browse the eight starter templates with hot reload. Each template's `PreviewProps` block (at the bottom of its TSX file) supplies the data passed to the component during preview — adjust them as needed.
+
+Static assets (logo, social icons, hero imagery) live under `static/` and are served at `/static/...` by the dev server. See `static/README.md` for layout.
 
 ## Newsletter clone + publish workflow
 
@@ -21,9 +40,10 @@ When a newsletter is created with `NEWSLETTERS_BOILERPLATE_URL` pointing at this
 └────────────────────────────┬────────────────────────────────────┘
                              ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│  Reads manifest.json → enabled_blocks → editor's palette shows  │
-│  Heading + Text + Button (the platform-provided react-email     │
-│  registry components, filtered by manifest)                     │
+│  Reads manifest.json → `enabled_blocks` populates the editor    │
+│  slash-command palette (Header / Content / Footer / …).         │
+│  `starter_templates` exposes the Barebone TSX files as          │
+│  "start from template" presets in the new-edition flow.         │
 └────────────────────────────┬────────────────────────────────────┘
                              ▼
 ┌─────────────────────────────────────────────────────────────────┐
@@ -38,33 +58,67 @@ When a newsletter is created with `NEWSLETTERS_BOILERPLATE_URL` pointing at this
 └─────────────────────────────────────────────────────────────────┘
 ```
 
+## Repo layout
+
+```
+gatewaze-template-email/
+├── manifest.json            ← which platform-registry blocks the editor exposes,
+│                              + `starter_templates` listing the TSX files in emails/
+├── emails/                  ← React-Email starter templates (Barebone-style)
+│   ├── theme.ts             ←   shared Tailwind config (colors, fontScale, mobile variant)
+│   ├── theme-fonts.tsx      ←   Inter @font-face + <Font> fallback registration
+│   ├── welcome.tsx          ←   each TSX file is a complete edition: <Html><Body>…</Body></Html>
+│   ├── activation.tsx
+│   ├── password-reset.tsx
+│   ├── feature-announcement.tsx
+│   ├── product-update.tsx
+│   ├── subscription-confirmation.tsx
+│   ├── subscription-update.tsx
+│   └── text-only.tsx
+├── static/                  ← logo, social icons, hero imagery served by `email dev`
+├── content/                 ← Mustache content fixtures (legacy path)
+├── source.html              ← Mustache wrapper + blocks (legacy path)
+├── theme.json               ← Mustache theme tokens (legacy path)
+├── package.json
+└── tsconfig.json
+```
+
 ## manifest.json
 
-`manifest.json` is the source of truth for which platform-registry blocks the newsletter palette exposes. Operators may extend it with per-block overrides (label, defaults). Per-tenant TSX components committed directly to this repo are Phase 2.
+`manifest.json` is the source of truth for what the editor exposes:
 
-## How gatewaze ingests source.html (legacy Mustache path)
+- `enabled_blocks` — IDs of platform-registry blocks that should appear in the slash-command palette. The platform supplies the implementation; this file just opts in.
+- `starter_templates` — full-edition TSX files in `emails/`. The platform reads this list to populate the "start from template" picker when an operator creates a new edition.
+- `publish_branch` — branch name where rendered editions are committed (default `publish`).
+- `publish_layout` — pathname template for `editions/<id>.html` and `editions/<id>.json`.
 
-When an operator connects this repo as a templates source for a newsletter / event / calendar collection (`templates_libraries.theme_kind = 'email'`):
+Per-tenant TSX components committed directly to `emails/` are surfaced today as starter templates (full editions). Phase 2 will add runtime TSX compilation so individual block-level components committed by tenants can also flow into the slash-command palette.
 
-1. The templates parser walks `source.html`.
-2. Extracts every `<!-- WRAPPER:key -->` / `<!-- BLOCK:key -->` / `<!-- BRICK:key -->` block + the adjacent `<!-- SCHEMA:{...} -->` JSON Schema.
-3. Inserts/updates rows in `templates_wrappers`, `templates_block_defs`, `templates_brick_defs` (per the `templates_apply_source` RPC).
-4. Editors can then compose newsletter editions / event pages / calendar pages from the available block palette.
+## Customising
 
-## What's in source.html
+### Brand the starter templates
 
-| Marker | Purpose |
-|--------|---------|
-| `WRAPPER:default` | The email shell — `<!doctype html>` through `</body>`. The `{{>page_body}}` slot is where the composed block list lands. |
-| `BLOCK:heading` | Single heading; `level` ∈ `{h1, h2, h3}`. |
-| `BLOCK:paragraph` | Rich-text body. The `format: 'html'` field hint tells the editor to use the rich-text editor. |
-| `BLOCK:cta_button` | Primary CTA link with brand styling. |
-| `BLOCK:event_list` | A repeating list of events (`has_bricks=true`); each item is a `BRICK:event_list_item`. |
-| `BRICK:event_list_item` | Single event row inside `event_list`. |
-| `BLOCK:divider` | Horizontal rule for visual separation. |
-| `BLOCK:image` | Centered image with optional caption + link. |
+1. Edit `emails/theme.ts` — swap the `colors` and `fontScale` values, or add new design tokens. The Tailwind plugin auto-generates `font-{step}` utility classes for every key in `fontScale`.
+2. Replace the Inter fallback URLs in `emails/theme-fonts.tsx` with your brand font.
+3. Drop your logo + social icons into `static/shared/` (see `static/README.md`).
+4. Run `pnpm email:dev` to verify in the local preview before pushing.
 
-## Marker grammar reference
+### Add a new starter template
+
+1. Create `emails/<name>.tsx` following the Barebone pattern: import `Body / Container / Tailwind / …` from `@react-email/components`, wrap the email body in `<Tailwind config={barebonesBoxedTailwindConfig}>`, and export both a named export and `export default`.
+2. Add a `<Component>.PreviewProps = {…} satisfies <Props>` block at the bottom for local preview.
+3. Append an entry to `manifest.json` → `starter_templates.templates`.
+4. Push. Newsletters cloned from this boilerplate will see it on their next manifest fetch.
+
+### Add a platform-registry block to the palette
+
+The platform owns the implementation of `header / content_section / ai_section / footer / heading / text / button`. To enable a new one for newsletters cloning this boilerplate, add it to `manifest.json` → `enabled_blocks`. To author a new block that the platform doesn't ship yet, see the platform's `gatewaze-modules/modules/newsletters/admin/components/puck/email-blocks/` registry — that's where the component lives until Phase 2 lifts arbitrary tenant blocks out of the platform monorepo.
+
+### Customise the legacy Mustache path
+
+`source.html` is parsed by the templates module (`<!-- WRAPPER:key -->` / `<!-- BLOCK:key -->` / `<!-- BRICK:key -->` markers + `<!-- SCHEMA:{...} -->` JSON Schema). See the **Marker grammar reference** below.
+
+## Marker grammar reference (legacy Mustache path)
 
 ```
 <!-- WRAPPER:key | name=... -->
@@ -94,17 +148,15 @@ Field interpolation uses Mustache:
 
 See `gatewaze-modules/modules/templates/lib/parser/markers.ts` for the parser implementation.
 
-## Customising
-
-- **Brand styling** — edit the `<style>` block inside `WRAPPER:default`. Email clients vary in CSS support; keep it inline-friendly.
-- **Add a block** — append a new `<!-- BLOCK:key -->...<!-- /BLOCK:key -->` section with its own `<!-- SCHEMA:... -->`. Push to your repo. Run **Apply theme** in the gatewaze admin's Source tab.
-- **Add a brick** — only allowed inside a `BLOCK` declared with `has_bricks=true`. Mirror the `event_list` / `event_list_item` pattern.
-- **Test rendering** — use any Mustache renderer locally (e.g. the `mustache` npm package) with sample content to preview before committing.
-
 ## Compatibility
 
-- Renders cleanly in Gmail, Outlook (modern), Apple Mail, Yahoo, ProtonMail.
-- Outlook on Windows is the most picky — keep table layouts simple, avoid CSS Grid / Flexbox at the top level.
+- The Barebone templates target Gmail, Outlook (modern), Apple Mail, Yahoo, ProtonMail. They use react-email's table-based primitives (`Section / Row / Column`) so Outlook on Windows renders cleanly.
+- The Tailwind utilities are inlined to per-element styles by `@react-email/render` at publish time — no external stylesheet ships in the email body.
+- The `mobile:` variant in `theme.ts` adds a `@media (max-width: 600px)` rule that all major email clients respect.
+
+## Credits
+
+Starter templates adapted from [react-email's Barebone demo](https://github.com/resend/react-email/tree/canary/apps/demo/emails/01-Barebone) (MIT). The Inter font fallback URLs and font-scale tokens are imported as-is.
 
 ## License
 

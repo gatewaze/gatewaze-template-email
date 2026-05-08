@@ -1,10 +1,22 @@
 {
   "name": "gatewaze-template-email",
-  "version": "0.1.0",
+  "version": "0.4.0",
   "private": true,
   "license": "Apache-2.0",
-  "description": "Boilerplate email theme for the gatewaze newsletters / events / calendars modules. Single source.html marked up with WRAPPER / BLOCK / BRICK comments per the templates parser grammar.",
+  "description": "Gatewaze email boilerplate. React-Email project layout (emails/ + theme.ts + theme-fonts.tsx) authored in the Barebone style; cloned per-newsletter on creation. Manifest declares which platform-registry blocks are exposed in the editor palette and where the publish branch writes rendered editions.",
   "scripts": {
-    "lint": "echo 'no lint configured (HTML-only theme; gatewaze ingest is the validator)'"
+    "email:dev": "email dev --dir emails",
+    "email:export": "email export --dir emails --outDir .out",
+    "lint": "echo 'no lint configured (templates validated by gatewaze ingest + react-email render)'"
+  },
+  "dependencies": {
+    "@react-email/components": "^1.0.12"
+  },
+  "devDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-email": "^4.0.0",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.5.0"
   }
 }

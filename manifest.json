@@ -1,10 +1,10 @@
 {
   "$schema": "https://gatewaze.com/schemas/email-boilerplate-manifest-v1.json",
   "name": "gatewaze-template-email",
-  "version": "0.3.0",
-  "description": "Email boilerplate. Each newsletter clones this repo on creation; the platform's react-email registry surfaces the blocks listed here in the edition editor's palette, and edition publishes write rendered HTML back to the cloned repo's `publish` branch.",
+  "version": "0.4.0",
+  "description": "Gatewaze email boilerplate. React-Email project layout (`emails/` + `theme.ts` + `theme-fonts.tsx`) cloned per-newsletter on creation. The platform's react-email block registry surfaces the blocks listed in `enabled_blocks`; edition publishes write rendered HTML back to the cloned repo's `publish` branch. The TSX files in `emails/` are starter templates (Barebone style) that operators can preview locally with `email dev` and copy/customise.",
   "render_kind": "react-email",
-  "comment": "When render_kind='react-email', the platform's email-blocks registry (gatewaze-modules/newsletters/admin/components/puck/email-blocks) is the source of truth for component implementations. This manifest enables specific componentIds and may override per-block defaults / labels. Per-tenant TSX components committed to this repo are Phase 2 (runtime-compiled).",
+  "comment": "When render_kind='react-email', the platform's email-blocks registry (gatewaze-modules/newsletters/admin/components/puck/email-blocks) is the source of truth for component implementations. This manifest enables specific componentIds and may override per-block defaults / labels. Per-tenant TSX components committed to this repo (under emails/) are surfaced as starter templates today; full runtime TSX compilation of arbitrary tenant components is Phase 2.",
   "enabled_blocks": [
     {
       "component_id": "header",
@@ -20,7 +20,7 @@
     },
     {
       "component_id": "ai_section",
-      "label": "AI Content Section",
+      "label": "Helix AI Content",
       "category": "Content",
       "default_for_basic_template": true
     },
@@ -46,6 +46,21 @@
       "category": "Action"
     }
   ],
+  "starter_templates": {
+    "comment": "Full-edition TSX templates ported from react-email's Barebone demo. Operators can preview locally via `pnpm email:dev`, copy any of these as the starting point for a new edition, or use them as reference when authoring custom react-email blocks. The `entry` path is relative to repo root.",
+    "theme_module": "emails/theme.ts",
+    "fonts_module": "emails/theme-fonts.tsx",
+    "templates": [
+      { "id": "welcome", "label": "Welcome", "category": "Onboarding", "entry": "emails/welcome.tsx", "export": "WelcomeEmail" },
+      { "id": "activation", "label": "Email confirmation", "category": "Transactional", "entry": "emails/activation.tsx", "export": "ConfirmEmail" },
+      { "id": "password-reset", "label": "Password reset", "category": "Transactional", "entry": "emails/password-reset.tsx", "export": "PasswordResetEmail" },
+      { "id": "feature-announcement", "label": "Feature announcement", "category": "Marketing", "entry": "emails/feature-announcement.tsx", "export": "FeatureAnnouncementEmail" },
+      { "id": "product-update", "label": "Product update", "category": "Marketing", "entry": "emails/product-update.tsx", "export": "ProductUpdateEmail" },
+      { "id": "subscription-confirmation", "label": "Subscription confirmation", "category": "Transactional", "entry": "emails/subscription-confirmation.tsx", "export": "SubscriptionConfirmation" },
+      { "id": "subscription-update", "label": "Subscription update", "category": "Transactional", "entry": "emails/subscription-update.tsx", "export": "SubscriptionUpdate" },
+      { "id": "text-only", "label": "Text-only", "category": "Plain", "entry": "emails/text-only.tsx", "export": "TextOnlyEmail" }
+    ]
+  },
   "publish_branch": "publish",
   "publish_layout": {
     "comment": "Where the publish-worker writes per-edition outputs.",
