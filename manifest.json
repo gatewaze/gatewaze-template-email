@@ -1,0 +1,55 @@
+{
+  "$schema": "https://gatewaze.com/schemas/email-boilerplate-manifest-v1.json",
+  "name": "gatewaze-template-email",
+  "version": "0.3.0",
+  "description": "Email boilerplate. Each newsletter clones this repo on creation; the platform's react-email registry surfaces the blocks listed here in the edition editor's palette, and edition publishes write rendered HTML back to the cloned repo's `publish` branch.",
+  "render_kind": "react-email",
+  "comment": "When render_kind='react-email', the platform's email-blocks registry (gatewaze-modules/newsletters/admin/components/puck/email-blocks) is the source of truth for component implementations. This manifest enables specific componentIds and may override per-block defaults / labels. Per-tenant TSX components committed to this repo are Phase 2 (runtime-compiled).",
+  "enabled_blocks": [
+    {
+      "component_id": "header",
+      "label": "Header",
+      "category": "Layout",
+      "default_for_basic_template": true
+    },
+    {
+      "component_id": "content_section",
+      "label": "Content Section",
+      "category": "Content",
+      "default_for_basic_template": true
+    },
+    {
+      "component_id": "ai_section",
+      "label": "AI Content Section",
+      "category": "Content",
+      "default_for_basic_template": true
+    },
+    {
+      "component_id": "footer",
+      "label": "Footer",
+      "category": "Layout",
+      "default_for_basic_template": true
+    },
+    {
+      "component_id": "heading",
+      "label": "Heading",
+      "category": "Content"
+    },
+    {
+      "component_id": "text",
+      "label": "Text",
+      "category": "Content"
+    },
+    {
+      "component_id": "button",
+      "label": "Button",
+      "category": "Action"
+    }
+  ],
+  "publish_branch": "publish",
+  "publish_layout": {
+    "comment": "Where the publish-worker writes per-edition outputs.",
+    "edition_html": "editions/{edition_id}.html",
+    "edition_json": "editions/{edition_id}.json"
+  }
+}

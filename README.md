@@ -1,8 +1,48 @@
 # gatewaze-template-email
 
-Boilerplate HTML email theme for the gatewaze newsletters / events / calendars modules. Single `source.html` file marked up with the templates parser's WRAPPER / BLOCK / BRICK comment grammar.
+Boilerplate email theme for the gatewaze newsletters / events / calendars modules. **Two coexisting authoring paths:**
 
-## How gatewaze ingests this
+1. **Mustache (`source.html`)** — single file marked up with the templates parser's WRAPPER / BLOCK / BRICK comment grammar. Any block authored here ends up in the email block library as `render_kind='mustache'`. The original gatewaze authoring path; still fully supported.
+2. **React-email registry (`manifest.json`)** — declarative manifest enabling the platform's react-email block components (Heading / Text / Button / …) for newsletters cloning this boilerplate. See **Newsletter clone + publish workflow** below.
+
+When a newsletter is created with `NEWSLETTERS_BOILERPLATE_URL` pointing at this repo, the platform clones it as a per-newsletter internal Git repo. Edition publishes write rendered HTML back to the cloned repo's `publish` branch (`editions/<edition_id>.html`); operators can graduate the internal repo to an external GitHub remote at any time.
+
+## Newsletter clone + publish workflow
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  Operator creates a newsletter "Daily Digest"                   │
+└────────────────────────────┬────────────────────────────────────┘
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  Platform clones gatewaze-template-email                        │
+│  → bare repo at /var/gatewaze/git/newsletter/<id>.git           │
+│  → row in gatewaze_internal_repos with host_kind='newsletter'   │
+└────────────────────────────┬────────────────────────────────────┘
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  Reads manifest.json → enabled_blocks → editor's palette shows  │
+│  Heading + Text + Button (the platform-provided react-email     │
+│  registry components, filtered by manifest)                     │
+└────────────────────────────┬────────────────────────────────────┘
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  Editor edits "May 8" edition; clicks Publish                   │
+└────────────────────────────┬────────────────────────────────────┘
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  Server renders the edition via `await render(<EditionEmail/>)` │
+│  Commits to `publish` branch:                                   │
+│    editions/<edition_id>.html  ← inlined-CSS email-safe HTML    │
+│    editions/<edition_id>.json  ← raw block tree                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+## manifest.json
+
+`manifest.json` is the source of truth for which platform-registry blocks the newsletter palette exposes. Operators may extend it with per-block overrides (label, defaults). Per-tenant TSX components committed directly to this repo are Phase 2.
+
+## How gatewaze ingests source.html (legacy Mustache path)
 
 When an operator connects this repo as a templates source for a newsletter / event / calendar collection (`templates_libraries.theme_kind = 'email'`):
 
