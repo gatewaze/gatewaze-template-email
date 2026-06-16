@@ -77,6 +77,9 @@ gatewaze-template-email/
 │   └── text-only.tsx
 ├── static/                  ← logo, social icons, hero imagery served by `email dev`
 ├── content/                 ← Mustache content fixtures (legacy path)
+├── wrappers/default.html    ← declarative page chrome (header + footer)
+│                              applied to every edition via EditionEmail's
+│                              <slot name="body" />
 ├── source.html              ← Mustache wrapper + blocks (legacy path)
 ├── theme.json               ← Mustache theme tokens (legacy path)
 ├── package.json
@@ -93,6 +96,51 @@ gatewaze-template-email/
 - `publish_layout` — pathname template for `editions/<id>.html` and `editions/<id>.json`.
 
 Per-tenant TSX components committed directly to `emails/` are surfaced today as starter templates (full editions). Phase 2 will add runtime TSX compilation so individual block-level components committed by tenants can also flow into the slash-command palette.
+
+## Header / footer — `wrappers/default.html`
+
+Header and footer chrome for every edition is defined declaratively in
+`wrappers/default.html`. The templates module ingests it into
+`templates_wrappers`; `EditionEmail` renders the edition body inside the
+wrapper's `<slot name="body" />`. Per-brand URLs and copy live in the markup
+directly — there is no separate config layer.
+
+```html
+<!-- wrappers/default.html (sketch) -->
+<!-- SCHEMA: {
+  "edition": {
+    "date":              { "type": "text", "label": "Edition date" },
+    "view_online_link":  { "type": "text", "label": "View Online URL" }
+  }
+} -->
+<Section>
+  <Text if="edition.date">{{edition.date}}</Text>
+</Section>
+
+<slot name="body" />
+
+<Section>
+  <Text>Footer copy goes here.</Text>
+</Section>
+```
+
+- **Same declarative grammar as blocks.** Allowlisted tags (`Section` / `Row` /
+  `Column` / `Text` / `Heading` / `Link` / `Img` / `Button` / `Hr` + plain
+  inert tags) compile to react-email components at render time.
+- **Per-brand values are baked into the markup.** Operators fork this file in
+  their newsletter's own repo and replace the placeholder text + URLs with
+  their brand. (Earlier versions kept those in `wrapper.json` — removed; the
+  template HTML is now the single source of truth.)
+- **Body slot.** Exactly one `<slot name="body" />` per wrapper marks where
+  the rendered edition blocks go.
+- **Runtime values via mustache.** `{{edition.date}}`,
+  `{{edition.view_online_link}}`, `{{edition.title}}`, `{{edition.preheader}}`
+  are substituted per edition by `EditionEmail`. Use `if="edition.<field>"`
+  to hide chrome that depends on a missing runtime value (e.g. the published
+  page suppresses the View Online link).
+
+A newsletter cloned from this boilerplate gets `wrappers/default.html` out of
+the box; the operator edits the file in their newsletter's repo to brand it.
 
 ## Customising
 
