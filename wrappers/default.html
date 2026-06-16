@@ -1,0 +1,48 @@
+<!-- SCHEMA: {
+  "edition": {
+    "date":              {"type": "text", "label": "Edition date"},
+    "title":             {"type": "text", "label": "Edition title"},
+    "preheader":         {"type": "text", "label": "Preheader"},
+    "view_online_link":  {"type": "text", "label": "View Online URL"}
+  }
+} -->
+
+<!--
+  Default newsletter wrapper, shipped with the gatewaze email boilerplate.
+
+  When an operator creates a new newsletter via "Seed from boilerplate",
+  this file is cloned along with the rest of the boilerplate repo. The
+  templates module's apply step picks it up under wrappers/ and writes a
+  row to templates_wrappers; EditionEmail then renders every edition with
+  the edition body inside the <slot name="body" /> below.
+
+  Operators are expected to fork this file in their newsletter's own git
+  repo and replace the placeholder text / URLs with their brand. Per-brand
+  values (header CTAs, footer social links, partner contact, etc.) live
+  in the markup directly — no separate config layer.
+-->
+
+<Section>
+  <div style="padding: 16px 0; border-bottom: 1px solid #e5e7eb">
+    <Text if="edition.date" style="margin: 0; text-align: center; font-size: 13px; color: #6b7280">
+      {{edition.date}}
+    </Text>
+    <Text if="edition.view_online_link" style="margin: 6px 0 0; text-align: center; font-size: 12px; color: #6b7280">
+      <Link href="{{edition.view_online_link}}" style="color: #2563eb; text-decoration: underline">
+        View in browser
+      </Link>
+    </Text>
+  </div>
+</Section>
+
+<slot name="body" />
+
+<Section>
+  <div style="padding: 16px 0; border-top: 1px solid #e5e7eb">
+    <Text style="margin: 0; text-align: center; font-size: 12px; color: #6b7280; line-height: 1.5">
+      Thanks for reading. To customise this footer (and the header above),
+      edit <code style="font-family: ui-monospace, monospace; background: #f3f4f6; padding: 1px 4px; border-radius: 3px">wrappers/default.html</code>
+      in your newsletter's git repo.
+    </Text>
+  </div>
+</Section>
