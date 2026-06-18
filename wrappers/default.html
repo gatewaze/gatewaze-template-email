@@ -1,9 +1,11 @@
 <!-- SCHEMA: {
   "edition": {
-    "date":              {"type": "text", "label": "Edition date"},
-    "title":             {"type": "text", "label": "Edition title"},
-    "preheader":         {"type": "text", "label": "Preheader"},
-    "view_online_link":  {"type": "text", "label": "View Online URL"}
+    "date":                     {"type": "text", "label": "Edition date"},
+    "title":                    {"type": "text", "label": "Edition title"},
+    "preheader":                {"type": "text", "label": "Preheader"},
+    "view_online_link":         {"type": "text", "label": "View Online URL"},
+    "unsubscribe_url":          {"type": "text", "label": "Unsubscribe URL"},
+    "manage_subscriptions_url": {"type": "text", "label": "Manage subscriptions URL"}
   }
 } -->
 
@@ -43,6 +45,11 @@
       Thanks for reading. To customise this footer (and the header above),
       edit <code style="font-family: ui-monospace, monospace; background: #f3f4f6; padding: 1px 4px; border-radius: 3px">wrappers/default.html</code>
       in your newsletter's git repo.
+    </Text>
+    <Text style="margin: 12px 0 0; text-align: center; font-size: 12px; color: #999">
+      <Link href="{{unsubscribe_url}}" style="color: #999; text-decoration: underline">Unsubscribe</Link>
+      &middot;
+      <Link href="{{manage_subscriptions_url}}" style="color: #999; text-decoration: underline">Manage your email preferences</Link>
     </Text>
   </div>
 </Section>
